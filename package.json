@@ -1,0 +1,13 @@
+{
+  "name": "4t2-landing-page",
+  "version": "1.0.0",
+  "description": "Static landing page with SVG logo",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+} 
