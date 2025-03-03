@@ -22,40 +22,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get the SVG element
     const svgElement = document.querySelector('svg');
-    if (svgElement) {
-        // Function to get a random color different from the current one and the excluded color
-        const getRandomColor = (currentColor: string, excludeColor: string = '') => {
-            let newColor;
-            do {
-                newColor = colors[Math.floor(Math.random() * colors.length)];
-            } while (newColor === currentColor || newColor === excludeColor);
-            return newColor;
-        };
-        
-        // Function to update all SVG paths with a new color
-        const updateLogoColor = (color: string) => {
+    
+    // Function to get a random color different from the current one and the excluded color
+    const getRandomColor = (currentColor: string, excludeColor: string = '') => {
+        let newColor;
+        do {
+            newColor = colors[Math.floor(Math.random() * colors.length)];
+        } while (newColor === currentColor || newColor === excludeColor);
+        return newColor;
+    };
+    
+    // Function to update all SVG paths with a new color
+    const updateLogoColor = (color: string) => {
+        if (svgElement) {
             const paths = svgElement.querySelectorAll('path');
             paths.forEach(path => {
                 path.setAttribute('fill', color);
             });
             currentLogoColor = color;
-        };
+        }
+    };
+    
+    // Function to change colors
+    const changeColors = () => {
+        // Change colors - ensure they're different from each other
+        const newBgColor = getRandomColor(currentBgColor);
+        const newLogoColor = getRandomColor(currentLogoColor, newBgColor); // Exclude the new background color
         
-        // Add click event to make the logo shake and change colors
-        svgElement.addEventListener('click', () => {
+        // Update background color
+        document.body.style.backgroundColor = newBgColor;
+        currentBgColor = newBgColor;
+        
+        // Update logo color
+        updateLogoColor(newLogoColor);
+    };
+    
+    // Add click event to the entire document to change colors
+    document.addEventListener('click', () => {
+        changeColors();
+    });
+    
+    // Add click event to the SVG to make it shake (and stop propagation)
+    if (svgElement) {
+        svgElement.addEventListener('click', (event) => {
+            // Prevent the document click event from firing
+            event.stopPropagation();
+            
             // Add the shake class
             svgElement.classList.add('shake');
             
-            // Change colors - ensure they're different from each other
-            const newBgColor = getRandomColor(currentBgColor);
-            const newLogoColor = getRandomColor(currentLogoColor, newBgColor); // Exclude the new background color
-            
-            // Update background color
-            document.body.style.backgroundColor = newBgColor;
-            currentBgColor = newBgColor;
-            
-            // Update logo color
-            updateLogoColor(newLogoColor);
+            // Change colors
+            changeColors();
             
             // Remove the shake class after the animation completes
             setTimeout(() => {
