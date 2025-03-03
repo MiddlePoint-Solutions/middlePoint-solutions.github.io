@@ -37,6 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLogoColor = color;
         }
     };
+    // Function to shake the logo
+    const shakeLogo = () => {
+        if (svgElement) {
+            // Add the shake class
+            svgElement.classList.add('shake');
+            // Remove the shake class after the animation completes
+            setTimeout(() => {
+                svgElement.classList.remove('shake');
+            }, 200); // 200ms matches the animation duration
+        }
+    };
     // Function to change colors
     const changeColors = () => {
         // Change colors - ensure they're different from each other
@@ -48,23 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update logo color
         updateLogoColor(newLogoColor);
     };
-    // Add click event to the entire document to change colors
+    // Add click event to the entire document to change colors and shake the logo
     document.addEventListener('click', () => {
         changeColors();
+        shakeLogo();
     });
-    // Add click event to the SVG to make it shake (and stop propagation)
-    if (svgElement) {
-        svgElement.addEventListener('click', (event) => {
-            // Prevent the document click event from firing
-            event.stopPropagation();
-            // Add the shake class
-            svgElement.classList.add('shake');
-            // Change colors
-            changeColors();
-            // Remove the shake class after the animation completes
-            setTimeout(() => {
-                svgElement.classList.remove('shake');
-            }, 200); // 200ms matches the animation duration
-        });
-    }
+    // No need for a separate event handler for the SVG since we want the same behavior
+    // for clicking anywhere on the page
 });
