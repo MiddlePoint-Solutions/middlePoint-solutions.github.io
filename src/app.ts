@@ -8,6 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBgColor = '#001F2E';
     let currentLogoColor = '#91FF77';
     
+    // Define invalid color pairs that shouldn't be used together
+    const invalidPairs = [
+        ['#EBFF53', '#F2F7F7'],
+        ['#91FF77', '#F2F7F7'],
+        ['#EBFF53', '#91FF77'],
+        ['#003D47', '#001F2E']
+    ];
+    
+    // Function to check if a color pair is invalid
+    const isInvalidPair = (color1: string, color2: string): boolean => {
+        return invalidPairs.some(pair => 
+            (pair[0].toUpperCase() === color1.toUpperCase() && pair[1].toUpperCase() === color2.toUpperCase()) || 
+            (pair[0].toUpperCase() === color2.toUpperCase() && pair[1].toUpperCase() === color1.toUpperCase())
+        );
+    };
+    
     if (logoContainer) {
         // Insert the SVG with the initial color
         logoContainer.innerHTML = `
@@ -24,11 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const svgElement = document.querySelector('svg');
     
     // Function to get a random color different from the current one and the excluded color
-    const getRandomColor = (currentColor: string, excludeColor: string = '') => {
+    // Also avoiding invalid pairs with the specified color
+    const getRandomColor = (currentColor: string, pairWithColor: string): string => {
         let newColor;
+        let attempts = 0;
+        const maxAttempts = 100; // Prevent infinite loop
+        
         do {
             newColor = colors[Math.floor(Math.random() * colors.length)];
-        } while (newColor === currentColor || newColor === excludeColor);
+            attempts++;
+            
+            // If we've tried too many times, just pick any different color
+            if (attempts > maxAttempts) {
+                return colors.find(c => c !== currentColor && c !== pairWithColor) || colors[0];
+            }
+        } while (
+            newColor === currentColor || 
+            newColor === pairWithColor || 
+            isInvalidPair(newColor, pairWithColor)
+        );
+        
         return newColor;
     };
     
@@ -58,9 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Function to change colors
     const changeColors = () => {
-        // Change colors - ensure they're different from each other
-        const newBgColor = getRandomColor(currentBgColor);
-        const newLogoColor = getRandomColor(currentLogoColor, newBgColor); // Exclude the new background color
+        // First select a new background color
+        const newBgColor = getRandomColor(currentBgColor, currentLogoColor);
+        
+        // Then select a new logo color that works with the new background
+        const newLogoColor = getRandomColor(currentLogoColor, newBgColor);
         
         // Update background color
         document.body.style.backgroundColor = newBgColor;
@@ -75,7 +108,4 @@ document.addEventListener('DOMContentLoaded', () => {
         changeColors();
         shakeLogo();
     });
-    
-    // No need for a separate event handler for the SVG since we want the same behavior
-    // for clicking anywhere on the page
 }); 
